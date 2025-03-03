@@ -4,6 +4,9 @@ FROM ubuntu:22.04
 # Prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Set default port for Cloud Run
+ENV PORT=8080
+
 # Install required packages
 RUN apt-get update && apt-get install -y \
     nodejs \
@@ -20,10 +23,6 @@ RUN apt-get update && apt-get install -y \
 # Set up firewall
 RUN ufw default deny incoming && \
     ufw default allow outgoing && \
-    ufw allow 22/tcp && \
-    ufw allow 80/tcp && \
-    ufw allow 443/tcp && \
-    ufw allow 1194/udp && \
     ufw allow 8080/tcp
 
 # Set up fail2ban
@@ -69,8 +68,8 @@ RUN mkdir -p /var/log/openvpn && \
     touch /var/log/nginx/error.log && \
     touch /var/log/nginx/access.log
 
-# Expose ports
-EXPOSE 8080 80 443 22 1194
+# Expose port 8080 for Cloud Run
+EXPOSE 8080
 
 # Start services
 COPY start.sh /start.sh

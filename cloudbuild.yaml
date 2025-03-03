@@ -21,8 +21,6 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
-      - '--port'
-      - '80,443,22,1194'
       - '--cpu'
       - '1'
       - '--memory'
@@ -37,6 +35,10 @@ steps:
       - 'vpc-connector'
       - '--project'
       - 'phonic-ceremony-439615-i4'
+      - '--timeout'
+      - '300'
+      - '--port'
+      - '8080'
 
 images:
   - 'gcr.io/phonic-ceremony-439615-i4/sshwss' 

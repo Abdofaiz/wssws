@@ -16,23 +16,18 @@ const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
 const users = new Map();
 
 // Create HTTP server
-const httpServer = http.createServer(app);
+const server = http.createServer(app);
 
-// WebSocket server for port 80
-const wss = new WebSocket.Server({ server: httpServer });
-
-// HTTPS server for SSL/TLS
-const httpsServer = https.createServer({
-    key: fs.readFileSync('/etc/nginx/ssl/private.key'),
-    cert: fs.readFileSync('/etc/nginx/ssl/certificate.crt')
-}, app);
-
-// WebSocket server for SSL/TLS
-const wssSecure = new WebSocket.Server({ server: httpsServer });
+// WebSocket server
+const wss = new WebSocket.Server({ server });
 
 // Express routes
 app.get('/', (req, res) => {
     res.send('Server is running');
+});
+
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
 });
 
 // Telegram Bot commands
@@ -92,30 +87,13 @@ bot.onText(/\/status/, (msg) => {
 
 // WebSocket handlers
 wss.on('connection', (ws) => {
-    console.log('New WebSocket connection on port 80');
+    console.log('New WebSocket connection');
     ws.on('message', (message) => {
         console.log('Received:', message);
     });
 });
 
-wssSecure.on('connection', (ws) => {
-    console.log('New secure WebSocket connection on port 443');
-    ws.on('message', (message) => {
-        console.log('Received secure:', message);
-    });
-});
-
-// Start HTTP server
-httpServer.listen(80, () => {
-    console.log('HTTP Server running on port 80');
-});
-
-// Start HTTPS server
-httpsServer.listen(443, () => {
-    console.log('HTTPS Server running on port 443');
-});
-
-// Start Express server
-app.listen(port, () => {
-    console.log(`Express Server listening on port ${port}`);
+// Start server
+server.listen(port, '0.0.0.0', () => {
+    console.log(`Server is running on port ${port}`);
 }); 
