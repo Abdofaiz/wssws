@@ -1,0 +1,42 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/phonic-ceremony-439615-i4/sshwss', '.']
+
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/phonic-ceremony-439615-i4/sshwss']
+
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'sshwss'
+      - '--image'
+      - 'gcr.io/phonic-ceremony-439615-i4/sshwss'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '80,443,22,1194'
+      - '--cpu'
+      - '1'
+      - '--memory'
+      - '2Gi'
+      - '--min-instances'
+      - '1'
+      - '--max-instances'
+      - '10'
+      - '--set-env-vars'
+      - 'TELEGRAM_BOT_TOKEN=${_TELEGRAM_BOT_TOKEN}'
+      - '--vpc-connector'
+      - 'vpc-connector'
+      - '--project'
+      - 'phonic-ceremony-439615-i4'
+
+images:
+  - 'gcr.io/phonic-ceremony-439615-i4/sshwss' 
